@@ -1,0 +1,961 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>38-元编程：一边写程序，一边写语言</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+        <style>
+        html {
+            color: #333;
+            -webkit-text-size-adjust: 100%;
+            -ms-text-size-adjust: 100%;
+            text-rendering: optimizelegibility;
+            font-family: Helvetica Neue, PingFang SC, Verdana, Microsoft Yahei, Hiragino Sans GB, Microsoft Sans Serif, WenQuanYi Micro Hei, sans-serif
+        }
+
+        html.borderbox *,
+        html.borderbox :after,
+        html.borderbox :before {
+            box-sizing: border-box
+        }
+
+        article,
+        aside,
+        blockquote,
+        body,
+        button,
+        code,
+        dd,
+        details,
+        dl,
+        dt,
+        fieldset,
+        figcaption,
+        figure,
+        footer,
+        form,
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6,
+        header,
+        hr,
+        input,
+        legend,
+        li,
+        menu,
+        nav,
+        ol,
+        p,
+        pre,
+        section,
+        td,
+        textarea,
+        th,
+        ul {
+            margin: 0;
+            padding: 0
+        }
+
+        article,
+        aside,
+        details,
+        figcaption,
+        figure,
+        footer,
+        header,
+        menu,
+        nav,
+        section {
+            display: block
+        }
+
+        audio,
+        canvas,
+        video {
+            display: inline-block
+        }
+
+        body,
+        button,
+        input,
+        select,
+        textarea {
+            font: 300 1em/1.8 PingFang SC, Lantinghei SC, Microsoft Yahei, Hiragino Sans GB, Microsoft Sans Serif, WenQuanYi Micro Hei, Helvetica, sans-serif
+        }
+
+        button::-moz-focus-inner,
+        input::-moz-focus-inner {
+            padding: 0;
+            border: 0
+        }
+
+        table {
+            border-collapse: collapse;
+            border-spacing: 0
+        }
+
+        fieldset,
+        img {
+            border: 0
+        }
+
+        blockquote {
+            position: relative;
+            color: #999;
+            font-weight: 400;
+            border-left: 1px solid #1abc9c;
+            padding-left: 1em;
+            margin: 1em 3em 1em 2em
+        }
+
+        @media only screen and (max-width: 640px) {
+            blockquote {
+                margin: 1em 0
+            }
+        }
+
+        abbr,
+        acronym {
+            border-bottom: 1px dotted;
+            font-variant: normal
+        }
+
+        abbr {
+            cursor: help
+        }
+
+        del {
+            text-decoration: line-through
+        }
+
+        address,
+        caption,
+        cite,
+        code,
+        dfn,
+        em,
+        th,
+        var {
+            font-style: normal;
+            font-weight: 400
+        }
+
+        ol,
+        ul {
+            list-style: none
+        }
+
+        caption,
+        th {
+            text-align: left
+        }
+
+        q:after,
+        q:before {
+            content: ""
+        }
+
+        sub,
+        sup {
+            font-size: 75%;
+            line-height: 0;
+            position: relative
+        }
+
+        :root sub,
+        :root sup {
+            vertical-align: baseline
+        }
+
+        sup {
+            top: -.5em
+        }
+
+        sub {
+            bottom: -.25em
+        }
+
+        a {
+            color: #1abc9c
+        }
+
+        a:hover {
+            text-decoration: underline
+        }
+
+        .typo a {
+            border-bottom: 1px solid #1abc9c
+        }
+
+        .typo a:hover {
+            border-bottom-color: #555;
+            color: #555
+        }
+
+        .typo a:hover,
+        a,
+        ins {
+            text-decoration: none
+        }
+
+        .typo-u,
+        u {
+            text-decoration: underline
+        }
+
+        mark {
+            background: #fffdd1;
+            border-bottom: 1px solid #ffedce;
+            padding: 2px;
+            margin: 0 5px
+        }
+
+        code,
+        pre,
+        pre tt {
+            font-family: Courier, Courier New, monospace
+        }
+
+        pre {
+            background: hsla(0, 0%, 97%, .7);
+            border: 1px solid #ddd;
+            padding: 1em 1.5em;
+            display: block;
+            -webkit-overflow-scrolling: touch
+        }
+
+        hr {
+            border: none;
+            border-bottom: 1px solid #cfcfcf;
+            margin-bottom: .8em;
+            height: 10px
+        }
+
+        .typo-small,
+        figcaption,
+        small {
+            font-size: .9em;
+            color: #888
+        }
+
+        b,
+        strong {
+            font-weight: 700;
+            color: #000
+        }
+
+        [draggable] {
+            cursor: move
+        }
+
+        .clearfix:after,
+        .clearfix:before {
+            content: "";
+            display: table
+        }
+
+        .clearfix:after {
+            clear: both
+        }
+
+        .clearfix {
+            zoom: 1
+        }
+
+        .textwrap,
+        .textwrap td,
+        .textwrap th {
+            word-wrap: break-word;
+            word-break: break-all
+        }
+
+        .textwrap-table {
+            table-layout: fixed
+        }
+
+        .serif {
+            font-family: Palatino, Optima, Georgia, serif
+        }
+
+        .typo-dl,
+        .typo-form,
+        .typo-hr,
+        .typo-ol,
+        .typo-p,
+        .typo-pre,
+        .typo-table,
+        .typo-ul,
+        .typo dl,
+        .typo form,
+        .typo hr,
+        .typo ol,
+        .typo p,
+        .typo pre,
+        .typo table,
+        .typo ul,
+        blockquote {
+            margin-bottom: 1rem
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            font-family: PingFang SC, Helvetica Neue, Verdana, Microsoft Yahei, Hiragino Sans GB, Microsoft Sans Serif, WenQuanYi Micro Hei, sans-serif;
+            color: #000;
+            line-height: 1.35
+        }
+
+        .typo-h1,
+        .typo-h2,
+        .typo-h3,
+        .typo-h4,
+        .typo-h5,
+        .typo-h6,
+        .typo h1,
+        .typo h2,
+        .typo h3,
+        .typo h4,
+        .typo h5,
+        .typo h6 {
+            margin-top: 1.2em;
+            margin-bottom: .6em;
+            line-height: 1.35
+        }
+
+        .typo-h1,
+        .typo h1 {
+            font-size: 2em
+        }
+
+        .typo-h2,
+        .typo h2 {
+            font-size: 1.8em
+        }
+
+        .typo-h3,
+        .typo h3 {
+            font-size: 1.6em
+        }
+
+        .typo-h4,
+        .typo h4 {
+            font-size: 1.4em
+        }
+
+        .typo-h5,
+        .typo-h6,
+        .typo h5,
+        .typo h6 {
+            font-size: 1.2em
+        }
+
+        .typo-ul,
+        .typo ul {
+            margin-left: 1.3em;
+            list-style: disc
+        }
+
+        .typo-ol,
+        .typo ol {
+            list-style: decimal;
+            margin-left: 1.9em
+        }
+
+        .typo-ol ol,
+        .typo-ol ul,
+        .typo-ul ol,
+        .typo-ul ul,
+        .typo li ol,
+        .typo li ul {
+            margin-bottom: .8em;
+            margin-left: 2em
+        }
+
+        .typo-ol ul,
+        .typo-ul ul,
+        .typo li ul {
+            list-style: circle
+        }
+
+        .typo-table td,
+        .typo-table th,
+        .typo table caption,
+        .typo table td,
+        .typo table th {
+            border: 1px solid #ddd;
+            padding: .5em 1em;
+            color: #666
+        }
+
+        .typo-table th,
+        .typo table th {
+            background: #fbfbfb
+        }
+
+        .typo-table thead th,
+        .typo table thead th {
+            background: hsla(0, 0%, 95%, .7)
+        }
+
+        .typo table caption {
+            border-bottom: none
+        }
+
+        .typo-input,
+        .typo-textarea {
+            -webkit-appearance: none;
+            border-radius: 0
+        }
+
+        .typo-em,
+        .typo em,
+        caption,
+        legend {
+            color: #000;
+            font-weight: inherit
+        }
+
+        .typo-em {
+            position: relative
+        }
+
+        .typo-em:after {
+            position: absolute;
+            top: .65em;
+            left: 0;
+            width: 100%;
+            overflow: hidden;
+            white-space: nowrap;
+            content: "\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB"
+        }
+
+        .typo img {
+            max-width: 100%
+        }
+
+        .common-content {
+            font-weight: 400;
+            color: #353535;
+            line-height: 1.75rem;
+            white-space: normal;
+            word-break: normal;
+            font-size: 1rem
+        }
+
+        .common-content img {
+            display: block;
+            max-width: 100%;
+            background-color: #eee
+        }
+
+        .common-content audio,
+        .common-content video {
+            width: 100%;
+            background-color: #eee
+        }
+
+        .common-content center,
+        .common-content font {
+            margin-top: 1rem;
+            display: inline-block
+        }
+
+        .common-content center {
+            width: 100%
+        }
+
+        .common-content pre {
+            margin-top: 1rem;
+            padding-left: 0;
+            padding-right: 0;
+            position: relative;
+            overflow: hidden
+        }
+
+        .common-content pre code {
+            font-size: .8rem;
+            font-family: Consolas, Liberation Mono, Menlo, monospace, Courier;
+            display: block;
+            width: 100%;
+            box-sizing: border-box;
+            padding-left: 1rem;
+            padding-right: 1rem;
+            overflow-x: auto
+        }
+
+        .common-content hr {
+            border: none;
+            margin-top: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-top: 1px solid #f5f5f5;
+            height: 1px;
+            background: none
+        }
+
+        .common-content b,
+        .common-content h1,
+        .common-content h2,
+        .common-content h3,
+        .common-content h4,
+        .common-content h5,
+        .common-content strong {
+            font-weight: 700
+        }
+
+        .common-content h1,
+        .common-content h2 {
+            font-size: 1.125rem;
+            margin-bottom: .45rem
+        }
+
+        .common-content h3,
+        .common-content h4,
+        .common-content h5 {
+            font-size: 1rem;
+            margin-bottom: .45rem
+        }
+
+        .common-content p {
+            font-weight: 400;
+            color: #353535;
+            margin-top: .15rem
+        }
+
+        .common-content .orange {
+            color: #ff5a05
+        }
+
+        .common-content .reference {
+            font-size: 1rem;
+            color: #888
+        }
+
+        .custom-rich-content h1 {
+            margin-top: 0;
+            font-weight: 400;
+            font-size: 15.25px;
+            border-bottom: 1px solid #eee;
+            line-height: 2.8
+        }
+
+        .custom-rich-content li,
+        .custom-rich-content p {
+            font-size: 14px;
+            color: #888;
+            line-height: 1.6
+        }
+
+        table.hljs-ln {
+            margin-bottom: 0;
+            border-spacing: 0;
+            border-collapse: collapse
+        }
+
+        table.hljs-ln,
+        table.hljs-ln tbody,
+        table.hljs-ln td,
+        table.hljs-ln tr {
+            box-sizing: border-box
+        }
+
+        table.hljs-ln td {
+            padding: 0;
+            border: 0
+        }
+
+        table.hljs-ln td.hljs-ln-numbers {
+            min-width: 15px;
+            color: rgba(27, 31, 35, .3);
+            text-align: right;
+            white-space: nowrap;
+            cursor: pointer;
+            user-select: none
+        }
+
+        table.hljs-ln td.hljs-ln-code,
+        table.hljs-ln td.hljs-ln-numbers {
+            font-family: SFMono-Regular, Consolas, Liberation Mono, Menlo, Courier, monospace;
+            font-size: 12px;
+            line-height: 20px;
+            vertical-align: top
+        }
+
+        table.hljs-ln td.hljs-ln-code {
+            position: relative;
+            padding-right: 10px;
+            padding-left: 10px;
+            overflow: visible;
+            color: #24292e;
+            word-wrap: normal;
+            white-space: pre
+        }
+
+        video::-webkit-media-controls {
+            overflow: hidden !important
+        }
+
+        video::-webkit-media-controls-enclosure {
+            width: calc(100% + 32px);
+            margin-left: auto
+        }
+
+        ._29HP61GA_0 {
+            max-width:800px;
+            margin:0 auto;
+            margin-bottom: 20px;
+            font-weight: 400;
+            color: #353535;
+            line-height: 1.76;
+            white-space: normal;
+            word-break: normal;
+            font-size: 17px;
+            -webkit-transition: background-color .3s ease;
+            transition: background-color .3s ease
+        }
+
+        ._29HP61GA_0 .MathJax_Display {
+            overflow: auto
+        }
+
+        ._29HP61GA_0 .poster {
+            position: fixed;
+            left: -10000px;
+            top: -10000px;
+            overflow: hidden;
+            padding: 1rem;
+            background: #ececec
+        }
+
+        ._29HP61GA_0 .richcontent-pre-copy {
+            font-size: 13px;
+            color: #888;
+            position: absolute;
+            right: 1em;
+            top: .5em;
+            cursor: pointer;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none
+        }
+
+        ._29HP61GA_0 .richcontent-pre-copy .iconfont {
+            font-size: 12px;
+            margin-right: .2em
+        }
+
+        ._29HP61GA_0 a {
+            color: #fa8919;
+            border-bottom: 1px solid #fa8919
+        }
+
+        ._29HP61GA_0 img {
+            display: block;
+            max-width: 100%;
+            position: relative;
+            left: 50%;
+            -webkit-transform: translateX(-50%);
+            transform: translateX(-50%);
+            background-color: #eee;
+            vertical-align: top;
+            border-radius: 0
+        }
+
+        ._29HP61GA_0 audio,
+        ._29HP61GA_0 video {
+            width: 100%;
+            background-color: #eee
+        }
+
+        ._29HP61GA_0 pre {
+            margin-top: 16px;
+            padding: 34px 0 0;
+            margin-bottom: 30px;
+            position: relative;
+            border-radius: 6px;
+            background: rgba(246, 247, 251, .749);
+            border: 0
+        }
+
+        ._29HP61GA_0 pre code {
+            font-size: 12px;
+            font-family: Consolas, Liberation Mono, Menlo, monospace, Courier;
+            display: block;
+            -webkit-box-sizing: border-box;
+            box-sizing: border-box;
+            margin-left: 16px;
+            margin-right: 16px;
+            overflow-x: scroll
+        }
+
+        ._29HP61GA_0 pre code:after {
+            content: "";
+            height: 30px;
+            width: 100%;
+            display: block
+        }
+
+        ._29HP61GA_0 hr {
+            border: none;
+            margin-top: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-top: 1px solid #f5f5f5;
+            height: 1px;
+            background: none
+        }
+
+        ._29HP61GA_0 h1,
+        ._29HP61GA_0 h2,
+        ._29HP61GA_0 h3,
+        ._29HP61GA_0 h4,
+        ._29HP61GA_0 h5 {
+            margin-bottom: 20px;
+            margin-top: 0;
+            font-weight: 700
+        }
+
+        ._29HP61GA_0 b,
+        ._29HP61GA_0 strong {
+            font-weight: 700
+        }
+
+        ._29HP61GA_0 h1 {
+            font-size: 21px
+        }
+
+        ._29HP61GA_0 h2 {
+            font-size: 20px
+        }
+
+        ._29HP61GA_0 h3 {
+            font-size: 19px
+        }
+
+        ._29HP61GA_0 h4 {
+            font-size: 18px
+        }
+
+        ._29HP61GA_0 h5 {
+            font-size: 17px
+        }
+
+        ._29HP61GA_0 center,
+        ._29HP61GA_0 p {
+            font-weight: 400;
+            color: #353535;
+            margin-top: 0;
+            margin-bottom: 30px;
+            word-break: break-word
+        }
+
+        ._29HP61GA_0 center {
+            text-align: center
+        }
+
+        ._29HP61GA_0 blockquote {
+            margin-top: 0;
+            margin-bottom: 34px;
+            border-left: 3px solid #e8e8e8;
+            padding-left: 17px;
+            color: #353535
+        }
+
+        ._29HP61GA_0 blockquote p {
+            margin-top: 0;
+            margin-bottom: 0
+        }
+
+        ._29HP61GA_0 ol,
+        ._29HP61GA_0 ul {
+            margin-bottom: 30px
+        }
+
+        ._29HP61GA_0 ol p,
+        ._29HP61GA_0 ul p {
+            margin-top: 0;
+            margin-bottom: 0
+        }
+
+        ._29HP61GA_0 ol {
+            list-style: decimal;
+            margin-left: 20px
+        }
+
+        ._29HP61GA_0 ul li {
+            padding-left: 17px;
+            position: relative;
+            margin-bottom: 10px
+        }
+
+        ._29HP61GA_0 ul li:after {
+            content: "";
+            height: 6px;
+            width: 6px;
+            border-radius: 50%;
+            background: #353535;
+            position: absolute;
+            top: 10px;
+            left: 0
+        }
+
+        ._29HP61GA_0 .orange {
+            color: #fa8919
+        }
+
+        ._29HP61GA_0 .reference {
+            color: #888
+        }
+
+        ._29HP61GA_0 .m-right {
+            text-align: right
+        }
+
+        ._29HP61GA_0 .m-center {
+            text-align: center;
+            display: block
+        }
+
+        ._29HP61GA_0 .m-gray {
+            color: #888
+        }
+
+        ._29HP61GA_0 .m-small {
+            font-size: 15px
+        }
+
+        ._29HP61GA_0 table.hljs-ln {
+            margin-bottom: 0;
+            border-spacing: 0;
+            border-collapse: collapse
+        }
+
+        ._29HP61GA_0 table.hljs-ln,
+        ._29HP61GA_0 table.hljs-ln tbody,
+        ._29HP61GA_0 table.hljs-ln td,
+        ._29HP61GA_0 table.hljs-ln tr {
+            -webkit-box-sizing: border-box;
+            box-sizing: border-box
+        }
+
+        ._29HP61GA_0 table.hljs-ln td {
+            padding: 0;
+            border: 0
+        }
+
+        ._29HP61GA_0 table.hljs-ln td.hljs-ln-numbers {
+            min-width: 15px;
+            font-size: 12px;
+            color: rgba(27, 31, 35, .3);
+            text-align: right;
+            white-space: nowrap;
+            cursor: pointer;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none
+        }
+
+        ._29HP61GA_0 table.hljs-ln td.hljs-ln-code,
+        ._29HP61GA_0 table.hljs-ln td.hljs-ln-numbers {
+            font-family: SFMono-Regular, Consolas, Liberation Mono, Menlo, Courier, monospace;
+            line-height: 20px;
+            vertical-align: top
+        }
+
+        ._29HP61GA_0 table.hljs-ln td.hljs-ln-code {
+            position: relative;
+            padding-right: 10px;
+            padding-left: 10px;
+            overflow: visible;
+            font-size: 13px;
+            color: #666;
+            word-wrap: normal;
+            white-space: pre
+        }
+
+    </style>
+</head>
+<body>
+<div class="_29HP61GA_0">
+<h1>38-元编程：一边写程序，一边写语言</h1>
+<p>今天，我再带你讨论一个很有趣的话题：元编程。把这个话题放在这一篇的压轴位置，也暗示了这个话题的重要性。</p><p>我估计很多同学会觉得元编程（Meta Programming）很神秘。编程，你不陌生，但什么是元编程呢？</p><p><strong>元编程是这样一种技术：</strong>你可以让计算机程序来操纵程序，也就是说，用程序修改或生成程序。另一种说法是，具有元编程能力的语言，能够把程序当做数据来处理，从而让程序产生程序。</p><p>而元编程也有传统编程所不具备的好处：比如，可以用更简单的编码来实现某个功能，以及可以按需产生、完成某个功能的代码，从而让系统更有灵活性。</p><p><strong>某种意义上，</strong>元编程让程序员拥有了语言设计者的一些权力。是不是很酷？你甚至可以说，普通程序员自己写程序，文艺程序员让程序写程序。</p><p>那么本节课，我会带你通过实际的例子，详细地来理解什么是元编程，然后探讨带有元编程能力的语言的特性，以及与编译技术的关系。通过这样的讨论，我希望你能理解元编程的思维，并利用编译技术和元编程的思维，提升自己的编程水平。</p><h2>从Lisp语言了解元编程</h2><p>说起元编程，追溯源头，应该追到Lisp语言。这门语言其实没有复杂的语法结构，仅有的语法结构就是一个个函数嵌套的调用，就像下面的表达式，其中“+”和“*”也是函数，并不是其他语言中的操作符：</p><!-- [[[read_end]]] --><pre><code>(+ 2 (* 3 5))   //对2和3求和，这里+是一个函数，并不是操作符
+</code></pre><p>你会发现，如果解析Lisp语言形成AST，是特别简单的事情，基本上括号嵌套的结构，就是AST的树状结构（其实，你让Antlr打印输出AST的时候，它缺省就是按照Lisp的格式输出的，括号嵌套括号）。这也是Lisp容易支持元编程的根本原因，你实际上可以通过程序来生成，或修改AST。</p><p>我采用了Common Lisp的一个实现，叫做SBCL。在macOS下，你可以用“brew intall sbcl”来安装它；而在Windows平台，你需要到sbcl.org去下载安装。在命令行输入sbcl，就可以进入它的REPL，你可以试着输入刚才的代码运行一下。</p><p>在Lisp中，你可以把(+ 2 (* 3 5))看做一段代码，也可以看做是一个列表数据。所以，你可以生成这样一组数据，然后作为代码执行。<strong>这就是Lisp的宏功能。</strong></p><p>我们通过一个例子来看一下，宏跟普通的函数有什么不同。下面两段代码分别是用Java和Common Lisp写的，都是求一组数据的最大值。</p><p>Java版本：</p><pre><code>public static int max(int[] numbers) {
+    int rtn = numbers[0];
+    for (int i = 1;i &lt; numbers.length; i++){
+        if (numbers[i] &gt; rtn) 
+            rtn = numbers[i];
+    }
+    return rtn;
+}
+</code></pre><p>Common Lisp版本：</p><pre><code>(defun mymax1 (list)
+  (let ((rtn (first list)))         ;让rtn等于list的第一个元素
+    (do ((i 1 (1+ i)))              ;做一个循环，让i从1开始，每次加1
+        ((&gt;= i (length list)) rtn)  ;循环终止条件：i&gt;=list的长度
+      (when (&gt; (nth i list) rtn)    ;如果list的第i个元素 &gt; rtn
+        (setf rtn (nth i list)))))) ;让rtn等于list的第i个元素
+</code></pre><p>那么，如果写一个函数，去求一组数据的最小值，你该怎么做呢？采用普通的编程方法，你会重写一个函数，里面大部分代码都跟求最大值的代码一样，只是把其中的一个“&gt;”改为"&lt;"。</p><p>这样的话，代码佷冗余。那么，能不能实现代码复用呢？这一点，用普通的编程方法是做不到的，你需要利用元编程技术。我们用Lisp的宏来实现一下：</p><pre><code>(defmacro maxmin(list pred)
+  (let ((rtn (first ,list)))
+     (do ((i 1 (1+ i)))
+         ((&gt;= i (length ,list)) rtn)
+       (when (,pred (nth i ,list) rtn)
+         (setf rtn (nth i ,list))))))
+
+(defun mymax2 (list)
+    (maxmin list &gt;))
+
+(defun mymin2 (list)
+    (maxmin list &lt;))
+</code></pre><p>在宏中，到底使用“&gt;” 还是使用“&lt;”，是可以作为参数传入的。你可以看一下函数mymax2和mymin2的定义。这样，宏展开后，就形成了不同的代码。你可以敲入下面的命令，显示一下宏展开后的效果（跟我们前面定义的mymax1函数是完全一样的）。</p><pre><code>(macroexpand-1 '(maxmin list &gt;))
+</code></pre><p>在Lisp运行时，会先进行宏展开，然后再编译或解释执行所生成的代码。通过这个例子，你是否理解了“用程序写程序”的含义呢？这种元编程技术用好了以后，会让代码特别精简，产生很多神奇的效果。</p><p>初步了解了元编程的含义之后，你可能会问，我们毕竟不熟悉Lisp语言，目前那些常见的语言有没有元编程机制呢？我们又该如何加以利用呢？</p><h2>不同语言的元编程机制</h2><p>首先，我们回到元编程的定义上来。比较狭义的定义认为，一门语言要像Lisp那样，要能够把程序当做数据来操作，这样才算是具备元编程的能力。</p><p>但是，你学过编译原理就知道，在CPU眼里，程序本来就是数据。</p><p>我们在<a href="https://time.geekbang.org/column/article/164017">34讲</a>，曾经直接把二进制机器码放到内存，然后作为函数调用执行。有一位同学在评论区留言说，这看上去就是把程序当数据处理。在<a href="https://time.geekbang.org/column/article/161944">32讲</a>中，我们也曾生成字节码，并动态加载进JVM中运行。这也是把程序当数据处理。</p><p>实际上，整个课程，都是在把程序当做数据来处理。你先把文本形式的代码变成Token，再变成AST，然后是IR，最后是汇编代码和机器代码。所以，有的研究者认为，编写编译器、汇编器、解释器、链接器、加载器、调试器，实际上都是在做元编程的工作，你可以参考一下<a href="https://cs.lmu.edu/~ray/notes/metaprogramming/">这篇文章</a>。</p><p><strong>从这里，你应该得到一个启示：</strong>学习汇编技术以后，你应该有更强的自信，去发掘你所采用的语言的元编程能力，从而去实现一些高级的功能。</p><p>当然了，通常我们说某个语言的元编程能力，要求并不高，没必要都去实现一个编译器（当然，如果必须要实现，你还是能做到的），而是利用语言本身的特性来操纵程序。<strong>这又分为两个级别：</strong></p><ul>
+<li>如果一门语言写的程序，能够报告它自身的信息，这叫做自省（introspection）。</li>
+<li>如果能够再进一步，操纵它自身，那就更高级一些，这叫做反射（reflection）。</li>
+</ul><p>那么你常见的语言，都具备哪些元编程能力呢？</p><p><strong>1. JavaScript</strong></p><p>从代码的可操纵性来看，JavaScript是很灵活的，可以给高水平的程序员，留下充分发挥的空间。JavaScript的对象就跟一个字典差不多，你可以随时给它添加或修改某个属性，你也可以通过拼接字符串，形成一段JavaScript代码，然后再用eval()解释执行。JavaScript还提供了一个Reflect对象，帮你更方便地操纵对象。</p><p>实际上，JavaScript被认为是继承了Lisp衣钵的几门语言之一，因为JavaScript的对象确实就是个可以随意修改的数据结构。这也难怪有人用JavaScript，实现了很多优秀的框架，比如React和Vue。</p><p><strong>2. Java</strong></p><p>从元编程的定义来看，Java的反射机制就算是一种元编程机制。你可以查询一个对象的属性和方法，你也可以用程序按需生成对象和方法来处理某些问题。</p><p>我们<a href="https://time.geekbang.org/column/article/161944">32讲</a>中的字节码生成技术，也是Java可以采用的元编程技术。你再配合上注解机制或者配置文件，就能实现类似Spring的功能。可以说，Spring是采用了元编程技术的典范。</p><p><strong>3. Clojure</strong></p><p>Clojure语言是在JVM上，运行的一个现代版本的Lisp语言，所以它也继承了Lisp的元编程机制。</p><p><strong>4. Ruby</strong></p><p>喜欢Ruby语言的人很多，一个重要原因在于Ruby的元编程能力。而Ruby也声称自己继承了Lisp语言的精髓。其实，它的元编程能力表现在，能够在运行时，随时修改对象的属性和方法。虽然实现方式不一样，但原理和JavaScript其实是很像的。</p><p>元编程技术使Ruby语言能够以很简单的方式快速实现功能，但因为Ruby过于动态，所以编译优化比较困难，性能比较差。Twitter最早是基于Ruby写的，但后来由于性能原因改成了Java。同样是动态性很强的语言，JavaScript在浏览器里使用普遍，厂商们做了大量的投入进行优化，因此，JavaScript在大部分情况下的性能，比Ruby高很多，有的<a href="https://benchmarksgame-team.pages.debian.net/benchmarksgame/fastest/node-yarv.html">测试用例</a>会高50倍以上。所以近几年，Ruby的流行度在下降。<strong>这也侧面说明了编译器后端技术的重要性。</strong></p><p><strong>5. C++语言</strong></p><p>C++语言也有元编程功能，最主要的就是模板（Template）技术。</p><p>C++标准库里的很多工具，都是用模板技术来写的，这部分功能叫做STL（Standard Template Library），其中常用的是vector、map、set这些集合类。<strong>它们的特点是，</strong>都能保存各种类型的数据。</p><p>看上去像是Java的泛型，如vector&lt; T &gt;，但C++和Java的实现机制是非常不同的。我们在<a href="https://time.geekbang.org/column/article/165078">35讲</a>中曾经提到Java的泛型，指出Java的泛型只是做了类型检查，实际上保存的都是Object对象的引用，List&lt; Integer &gt;和List&lt; String &gt;对应的字节码是相同的。</p><p>C++的模板则不一样。它像Lisp的宏一样，能够在编译期展开，生成C++代码再编译。vector&lt; double &gt;和vector&lt; long &gt;所生成的源代码是不同的，编译后的目标代码，当然也是不同的。</p><p>常见语言的元编程特性，你现在已经有所了解了。但是，关于是否应该用元编程的方法写程序，以及如何利用元编程方法，却存在一些争议。</p><h2>是否该使用元编程技术？</h2><p>我们看到，很多支持元编程技术的语言，都声称继承了Lisp的设计思想。Lisp语言也一致被认为是编程高手应该去使用的语言。可有一个悖论是，Lisp语言至今也还很小众。</p><p>Lisp语言的倡导者之一，Paul Graham，在互联网发展的早期，曾经用Lisp编写了一个互联网软件Viaweb，后来被Yahoo收购。但Yahoo收购以后，就用C++重新改写了。<strong>问题是：</strong>如果Lisp这么优秀，为什么会被替换掉呢？</p><p><strong>所以，一方面，</strong>Lisp受到很多极客的推崇，比如自由软件的领袖Richard Stallman就是Lisp的倡导者，他写的Emacs编辑器就采用了Lisp来自动实现很多功能。</p><p><strong>另一方面，</strong>Lisp却没有成为被大多数程序员所接受的语言。这该怎么解释呢？难道普通程序员不聪明，以至于没有办法掌握宏？进一步说，我们应该怎样看待元编程这种酷炫的技术呢？该不该用Lisp的宏那样的机制来编程呢？</p><p>程序员的圈子里，争论这个问题，争论了很多年。<strong>我比较赞同的一个看法是这样的：</strong>首先，像Lisp宏这样的元编程是很有用的，你可以用宏写出非常巧妙的库和框架，来给普通的程序员来用。但一个人写的宏对另外的人来说，确实是比较难懂、难维护的。从软件开发管理的角度看，难以维护的宏不是好事情。</p><p><strong>所以，我的结论是：</strong></p><p>首先，元编程还是比较高级的程序员的工作，就像比较高级的程序员才能写编译器一样。元编程其实比写编译器简单，但还是比一般的编程要难。</p><p>第二，如果你要用到元编程技术，最好所提供的软件是容易学习、维护良好的，就像React、Vue和Spring那样。这样，其他程序员只需要使用就行了，不必承担维护的职责。</p><p><strong>其实，我们学编译技术也是一样的。</strong>你不能指望公司或者项目组的每个人，都用编译技术写一个DSL或者写一个工具。毕竟维护这样的代码有一定的门槛，使用这些工具的人也有一定的学习成本。我曾经看到社区里有工程师抱怨，某国外大的互联网公司里面DSL泛滥，新加入的成员学习成本很高。所以，一个DSL也好、一套类库也好，必须提供的价值远远大于学习成本，才能被广泛接受。</p><p>为了降低使用者的学习成本，框架、工具的接口设计应该非常友好。<strong>怎样才算是友好呢？</strong>我们可以借鉴特定领域语言（DSL）的思路。</p><h2>发明自己的特定领域语言（DSL）</h2><p>框架和工具的设计者，为了解决某一个特定领域的问题，需要仔细设计自己的接口。好的接口设计是对领域问题的抽象，并通过这种抽象屏蔽了底层的技术细节。这跟上一讲我们提到语言设计的抽象原则是一样的。这样的面向领域的、设计良好的接口，很多情况下都表现为DSL，例如React的JSX、Spring的配置文件或注解。</p><p>DSL既然叫做语言，那么就应该具备语言设计的特征：通过简单的上层语义，屏蔽下层的技术细节，降低认知成本。</p><p>我很早以前就在BPM领域工作。像JBPM这样的开源软件，都提供了一个定义流程的模板，也就是DSL。<strong>这种DSL的优点是：</strong>你只需要了解与业务流程这个领域有关的知识，就可以定义一个流程，不需要知道流程实现的细节，学习成本很低。</p><p><a href="https://time.geekbang.org/column/article/136557">15讲</a>的报表工具的例子，也提供了一个报表模板的参考设计，这也是一个DSL。使用这个DSL的人也不需要了解报表实现的细节，也是符合抽象原则的。</p><p><strong>我们在日常工作中，还会发现很多这样的需求。</strong>你会想，如果有一门专门干这个事情的DSL就好了。比如，前两年我参与过一个儿童教育项目，教师需要一些带有动画的课件。如果要让一个卡通人物动起来，动画设计人员需要做很多繁琐的工作。当时就想，如果有一个语言，能够驱动这些卡通人物，让它做什么动作就做什么动作，屏蔽底层的技术复杂性，那么那些老师们就可以自己做动画了，充分发挥自己的创造力，而不需要求助于专门的技术人员。</p><p>当然，要实现这种DSL，有时候可以借助语言自带的元编程能力，就像React用JavaScript就能实现自己的DSL。但如果DSL的难度比较高，那还是要实现一个编译器，这可能就是终极的元编程技能了吧！</p><h2>课程小结</h2><p>本节课，我带你了解了元编程这个话题，并把它跟编译原理联系在一起，做了一些讨论。学习编译原理的人，某种意义上都是语言的设计者。而元编程，也是让程序员具有语言设计者的能力。所以，你可以利用自己关于编译的知识，来深入掌握自己所采用的语言的元编程能力。</p><p><strong>我希望你能记住几个要点：</strong></p><ul>
+<li>
+<p>元编程是指用程序操纵程序的能力，也就是用程序修改或者生成程序。也有人用另外的表述方式，认为具有元编程能力的语言，能够把程序当做数据来处理，典型的代表是Lisp语言。</p>
+</li>
+<li>
+<p>编译技术的本质就是把程序当做数据处理，所以你可以用编译技术的视角考察各种语言是如何实现元编程的。</p>
+</li>
+<li>
+<p>采用元编程技术，要保证所实现的软件是容易学习、维护良好的。</p>
+</li>
+<li>
+<p>好的DSL能够抽象出领域的特点，不需要使用者关心下层的技术细节。DSL可以用元编程技术实现，也可以用我们本课程的编译技术实现。</p>
+</li>
+</ul><h2>一课一思</h2><p>你之前了解过元编程技术吗？你曾经用元编程技术解决过什么问题呢？欢迎在留言区分享。</p><p>最后，感谢你的阅读，如果这篇文章让你有所收获，也欢迎你将它分享给更多的朋友。</p><p><img src="https://static001.geekbang.org/resource/image/00/66/008ff7b6092be5463a414a0e0771dc66.jpg" alt=""></p><h2>精选留言：</h2>
+        <ul>
+        
+<li>
+    <div>
+        <div style="color: #888;font-size:15.25px;font-weight:400;            line-height:1.2">
+            ning先森  2019-11-21 17:21:17
+        </div>
+        <div style="color:#353535;font-weight:400;white-space:normal;            word-break:break-all;line-height:1.6">
+            拉下好多了 
+        </div>
+        
+    </div>
+</li>
+            
+<br/>
+
+<li>
+    <div>
+        <div style="color: #888;font-size:15.25px;font-weight:400;            line-height:1.2">
+            Milittle  2019-11-21 13:52:55
+        </div>
+        <div style="color:#353535;font-weight:400;white-space:normal;            word-break:break-all;line-height:1.6">
+            老师有没有推荐学习编译的blog，就是那种大神的博客 从入门到精通？谢谢~ 
+        </div>
+        
+    </div>
+</li>
+            </ul>
+</div>
+</body>
+</html>

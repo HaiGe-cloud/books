@@ -1,0 +1,1245 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>加餐-汇编代码编程与栈帧管理</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+        <style>
+        html {
+            color: #333;
+            -webkit-text-size-adjust: 100%;
+            -ms-text-size-adjust: 100%;
+            text-rendering: optimizelegibility;
+            font-family: Helvetica Neue, PingFang SC, Verdana, Microsoft Yahei, Hiragino Sans GB, Microsoft Sans Serif, WenQuanYi Micro Hei, sans-serif
+        }
+
+        html.borderbox *,
+        html.borderbox :after,
+        html.borderbox :before {
+            box-sizing: border-box
+        }
+
+        article,
+        aside,
+        blockquote,
+        body,
+        button,
+        code,
+        dd,
+        details,
+        dl,
+        dt,
+        fieldset,
+        figcaption,
+        figure,
+        footer,
+        form,
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6,
+        header,
+        hr,
+        input,
+        legend,
+        li,
+        menu,
+        nav,
+        ol,
+        p,
+        pre,
+        section,
+        td,
+        textarea,
+        th,
+        ul {
+            margin: 0;
+            padding: 0
+        }
+
+        article,
+        aside,
+        details,
+        figcaption,
+        figure,
+        footer,
+        header,
+        menu,
+        nav,
+        section {
+            display: block
+        }
+
+        audio,
+        canvas,
+        video {
+            display: inline-block
+        }
+
+        body,
+        button,
+        input,
+        select,
+        textarea {
+            font: 300 1em/1.8 PingFang SC, Lantinghei SC, Microsoft Yahei, Hiragino Sans GB, Microsoft Sans Serif, WenQuanYi Micro Hei, Helvetica, sans-serif
+        }
+
+        button::-moz-focus-inner,
+        input::-moz-focus-inner {
+            padding: 0;
+            border: 0
+        }
+
+        table {
+            border-collapse: collapse;
+            border-spacing: 0
+        }
+
+        fieldset,
+        img {
+            border: 0
+        }
+
+        blockquote {
+            position: relative;
+            color: #999;
+            font-weight: 400;
+            border-left: 1px solid #1abc9c;
+            padding-left: 1em;
+            margin: 1em 3em 1em 2em
+        }
+
+        @media only screen and (max-width: 640px) {
+            blockquote {
+                margin: 1em 0
+            }
+        }
+
+        abbr,
+        acronym {
+            border-bottom: 1px dotted;
+            font-variant: normal
+        }
+
+        abbr {
+            cursor: help
+        }
+
+        del {
+            text-decoration: line-through
+        }
+
+        address,
+        caption,
+        cite,
+        code,
+        dfn,
+        em,
+        th,
+        var {
+            font-style: normal;
+            font-weight: 400
+        }
+
+        ol,
+        ul {
+            list-style: none
+        }
+
+        caption,
+        th {
+            text-align: left
+        }
+
+        q:after,
+        q:before {
+            content: ""
+        }
+
+        sub,
+        sup {
+            font-size: 75%;
+            line-height: 0;
+            position: relative
+        }
+
+        :root sub,
+        :root sup {
+            vertical-align: baseline
+        }
+
+        sup {
+            top: -.5em
+        }
+
+        sub {
+            bottom: -.25em
+        }
+
+        a {
+            color: #1abc9c
+        }
+
+        a:hover {
+            text-decoration: underline
+        }
+
+        .typo a {
+            border-bottom: 1px solid #1abc9c
+        }
+
+        .typo a:hover {
+            border-bottom-color: #555;
+            color: #555
+        }
+
+        .typo a:hover,
+        a,
+        ins {
+            text-decoration: none
+        }
+
+        .typo-u,
+        u {
+            text-decoration: underline
+        }
+
+        mark {
+            background: #fffdd1;
+            border-bottom: 1px solid #ffedce;
+            padding: 2px;
+            margin: 0 5px
+        }
+
+        code,
+        pre,
+        pre tt {
+            font-family: Courier, Courier New, monospace
+        }
+
+        pre {
+            background: hsla(0, 0%, 97%, .7);
+            border: 1px solid #ddd;
+            padding: 1em 1.5em;
+            display: block;
+            -webkit-overflow-scrolling: touch
+        }
+
+        hr {
+            border: none;
+            border-bottom: 1px solid #cfcfcf;
+            margin-bottom: .8em;
+            height: 10px
+        }
+
+        .typo-small,
+        figcaption,
+        small {
+            font-size: .9em;
+            color: #888
+        }
+
+        b,
+        strong {
+            font-weight: 700;
+            color: #000
+        }
+
+        [draggable] {
+            cursor: move
+        }
+
+        .clearfix:after,
+        .clearfix:before {
+            content: "";
+            display: table
+        }
+
+        .clearfix:after {
+            clear: both
+        }
+
+        .clearfix {
+            zoom: 1
+        }
+
+        .textwrap,
+        .textwrap td,
+        .textwrap th {
+            word-wrap: break-word;
+            word-break: break-all
+        }
+
+        .textwrap-table {
+            table-layout: fixed
+        }
+
+        .serif {
+            font-family: Palatino, Optima, Georgia, serif
+        }
+
+        .typo-dl,
+        .typo-form,
+        .typo-hr,
+        .typo-ol,
+        .typo-p,
+        .typo-pre,
+        .typo-table,
+        .typo-ul,
+        .typo dl,
+        .typo form,
+        .typo hr,
+        .typo ol,
+        .typo p,
+        .typo pre,
+        .typo table,
+        .typo ul,
+        blockquote {
+            margin-bottom: 1rem
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            font-family: PingFang SC, Helvetica Neue, Verdana, Microsoft Yahei, Hiragino Sans GB, Microsoft Sans Serif, WenQuanYi Micro Hei, sans-serif;
+            color: #000;
+            line-height: 1.35
+        }
+
+        .typo-h1,
+        .typo-h2,
+        .typo-h3,
+        .typo-h4,
+        .typo-h5,
+        .typo-h6,
+        .typo h1,
+        .typo h2,
+        .typo h3,
+        .typo h4,
+        .typo h5,
+        .typo h6 {
+            margin-top: 1.2em;
+            margin-bottom: .6em;
+            line-height: 1.35
+        }
+
+        .typo-h1,
+        .typo h1 {
+            font-size: 2em
+        }
+
+        .typo-h2,
+        .typo h2 {
+            font-size: 1.8em
+        }
+
+        .typo-h3,
+        .typo h3 {
+            font-size: 1.6em
+        }
+
+        .typo-h4,
+        .typo h4 {
+            font-size: 1.4em
+        }
+
+        .typo-h5,
+        .typo-h6,
+        .typo h5,
+        .typo h6 {
+            font-size: 1.2em
+        }
+
+        .typo-ul,
+        .typo ul {
+            margin-left: 1.3em;
+            list-style: disc
+        }
+
+        .typo-ol,
+        .typo ol {
+            list-style: decimal;
+            margin-left: 1.9em
+        }
+
+        .typo-ol ol,
+        .typo-ol ul,
+        .typo-ul ol,
+        .typo-ul ul,
+        .typo li ol,
+        .typo li ul {
+            margin-bottom: .8em;
+            margin-left: 2em
+        }
+
+        .typo-ol ul,
+        .typo-ul ul,
+        .typo li ul {
+            list-style: circle
+        }
+
+        .typo-table td,
+        .typo-table th,
+        .typo table caption,
+        .typo table td,
+        .typo table th {
+            border: 1px solid #ddd;
+            padding: .5em 1em;
+            color: #666
+        }
+
+        .typo-table th,
+        .typo table th {
+            background: #fbfbfb
+        }
+
+        .typo-table thead th,
+        .typo table thead th {
+            background: hsla(0, 0%, 95%, .7)
+        }
+
+        .typo table caption {
+            border-bottom: none
+        }
+
+        .typo-input,
+        .typo-textarea {
+            -webkit-appearance: none;
+            border-radius: 0
+        }
+
+        .typo-em,
+        .typo em,
+        caption,
+        legend {
+            color: #000;
+            font-weight: inherit
+        }
+
+        .typo-em {
+            position: relative
+        }
+
+        .typo-em:after {
+            position: absolute;
+            top: .65em;
+            left: 0;
+            width: 100%;
+            overflow: hidden;
+            white-space: nowrap;
+            content: "\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB\30FB"
+        }
+
+        .typo img {
+            max-width: 100%
+        }
+
+        .common-content {
+            font-weight: 400;
+            color: #353535;
+            line-height: 1.75rem;
+            white-space: normal;
+            word-break: normal;
+            font-size: 1rem
+        }
+
+        .common-content img {
+            display: block;
+            max-width: 100%;
+            background-color: #eee
+        }
+
+        .common-content audio,
+        .common-content video {
+            width: 100%;
+            background-color: #eee
+        }
+
+        .common-content center,
+        .common-content font {
+            margin-top: 1rem;
+            display: inline-block
+        }
+
+        .common-content center {
+            width: 100%
+        }
+
+        .common-content pre {
+            margin-top: 1rem;
+            padding-left: 0;
+            padding-right: 0;
+            position: relative;
+            overflow: hidden
+        }
+
+        .common-content pre code {
+            font-size: .8rem;
+            font-family: Consolas, Liberation Mono, Menlo, monospace, Courier;
+            display: block;
+            width: 100%;
+            box-sizing: border-box;
+            padding-left: 1rem;
+            padding-right: 1rem;
+            overflow-x: auto
+        }
+
+        .common-content hr {
+            border: none;
+            margin-top: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-top: 1px solid #f5f5f5;
+            height: 1px;
+            background: none
+        }
+
+        .common-content b,
+        .common-content h1,
+        .common-content h2,
+        .common-content h3,
+        .common-content h4,
+        .common-content h5,
+        .common-content strong {
+            font-weight: 700
+        }
+
+        .common-content h1,
+        .common-content h2 {
+            font-size: 1.125rem;
+            margin-bottom: .45rem
+        }
+
+        .common-content h3,
+        .common-content h4,
+        .common-content h5 {
+            font-size: 1rem;
+            margin-bottom: .45rem
+        }
+
+        .common-content p {
+            font-weight: 400;
+            color: #353535;
+            margin-top: .15rem
+        }
+
+        .common-content .orange {
+            color: #ff5a05
+        }
+
+        .common-content .reference {
+            font-size: 1rem;
+            color: #888
+        }
+
+        .custom-rich-content h1 {
+            margin-top: 0;
+            font-weight: 400;
+            font-size: 15.25px;
+            border-bottom: 1px solid #eee;
+            line-height: 2.8
+        }
+
+        .custom-rich-content li,
+        .custom-rich-content p {
+            font-size: 14px;
+            color: #888;
+            line-height: 1.6
+        }
+
+        table.hljs-ln {
+            margin-bottom: 0;
+            border-spacing: 0;
+            border-collapse: collapse
+        }
+
+        table.hljs-ln,
+        table.hljs-ln tbody,
+        table.hljs-ln td,
+        table.hljs-ln tr {
+            box-sizing: border-box
+        }
+
+        table.hljs-ln td {
+            padding: 0;
+            border: 0
+        }
+
+        table.hljs-ln td.hljs-ln-numbers {
+            min-width: 15px;
+            color: rgba(27, 31, 35, .3);
+            text-align: right;
+            white-space: nowrap;
+            cursor: pointer;
+            user-select: none
+        }
+
+        table.hljs-ln td.hljs-ln-code,
+        table.hljs-ln td.hljs-ln-numbers {
+            font-family: SFMono-Regular, Consolas, Liberation Mono, Menlo, Courier, monospace;
+            font-size: 12px;
+            line-height: 20px;
+            vertical-align: top
+        }
+
+        table.hljs-ln td.hljs-ln-code {
+            position: relative;
+            padding-right: 10px;
+            padding-left: 10px;
+            overflow: visible;
+            color: #24292e;
+            word-wrap: normal;
+            white-space: pre
+        }
+
+        video::-webkit-media-controls {
+            overflow: hidden !important
+        }
+
+        video::-webkit-media-controls-enclosure {
+            width: calc(100% + 32px);
+            margin-left: auto
+        }
+
+        ._29HP61GA_0 {
+            max-width:800px;
+            margin:0 auto;
+            margin-bottom: 20px;
+            font-weight: 400;
+            color: #353535;
+            line-height: 1.76;
+            white-space: normal;
+            word-break: normal;
+            font-size: 17px;
+            -webkit-transition: background-color .3s ease;
+            transition: background-color .3s ease
+        }
+
+        ._29HP61GA_0 .MathJax_Display {
+            overflow: auto
+        }
+
+        ._29HP61GA_0 .poster {
+            position: fixed;
+            left: -10000px;
+            top: -10000px;
+            overflow: hidden;
+            padding: 1rem;
+            background: #ececec
+        }
+
+        ._29HP61GA_0 .richcontent-pre-copy {
+            font-size: 13px;
+            color: #888;
+            position: absolute;
+            right: 1em;
+            top: .5em;
+            cursor: pointer;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none
+        }
+
+        ._29HP61GA_0 .richcontent-pre-copy .iconfont {
+            font-size: 12px;
+            margin-right: .2em
+        }
+
+        ._29HP61GA_0 a {
+            color: #fa8919;
+            border-bottom: 1px solid #fa8919
+        }
+
+        ._29HP61GA_0 img {
+            display: block;
+            max-width: 100%;
+            position: relative;
+            left: 50%;
+            -webkit-transform: translateX(-50%);
+            transform: translateX(-50%);
+            background-color: #eee;
+            vertical-align: top;
+            border-radius: 0
+        }
+
+        ._29HP61GA_0 audio,
+        ._29HP61GA_0 video {
+            width: 100%;
+            background-color: #eee
+        }
+
+        ._29HP61GA_0 pre {
+            margin-top: 16px;
+            padding: 34px 0 0;
+            margin-bottom: 30px;
+            position: relative;
+            border-radius: 6px;
+            background: rgba(246, 247, 251, .749);
+            border: 0
+        }
+
+        ._29HP61GA_0 pre code {
+            font-size: 12px;
+            font-family: Consolas, Liberation Mono, Menlo, monospace, Courier;
+            display: block;
+            -webkit-box-sizing: border-box;
+            box-sizing: border-box;
+            margin-left: 16px;
+            margin-right: 16px;
+            overflow-x: scroll
+        }
+
+        ._29HP61GA_0 pre code:after {
+            content: "";
+            height: 30px;
+            width: 100%;
+            display: block
+        }
+
+        ._29HP61GA_0 hr {
+            border: none;
+            margin-top: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-top: 1px solid #f5f5f5;
+            height: 1px;
+            background: none
+        }
+
+        ._29HP61GA_0 h1,
+        ._29HP61GA_0 h2,
+        ._29HP61GA_0 h3,
+        ._29HP61GA_0 h4,
+        ._29HP61GA_0 h5 {
+            margin-bottom: 20px;
+            margin-top: 0;
+            font-weight: 700
+        }
+
+        ._29HP61GA_0 b,
+        ._29HP61GA_0 strong {
+            font-weight: 700
+        }
+
+        ._29HP61GA_0 h1 {
+            font-size: 21px
+        }
+
+        ._29HP61GA_0 h2 {
+            font-size: 20px
+        }
+
+        ._29HP61GA_0 h3 {
+            font-size: 19px
+        }
+
+        ._29HP61GA_0 h4 {
+            font-size: 18px
+        }
+
+        ._29HP61GA_0 h5 {
+            font-size: 17px
+        }
+
+        ._29HP61GA_0 center,
+        ._29HP61GA_0 p {
+            font-weight: 400;
+            color: #353535;
+            margin-top: 0;
+            margin-bottom: 30px;
+            word-break: break-word
+        }
+
+        ._29HP61GA_0 center {
+            text-align: center
+        }
+
+        ._29HP61GA_0 blockquote {
+            margin-top: 0;
+            margin-bottom: 34px;
+            border-left: 3px solid #e8e8e8;
+            padding-left: 17px;
+            color: #353535
+        }
+
+        ._29HP61GA_0 blockquote p {
+            margin-top: 0;
+            margin-bottom: 0
+        }
+
+        ._29HP61GA_0 ol,
+        ._29HP61GA_0 ul {
+            margin-bottom: 30px
+        }
+
+        ._29HP61GA_0 ol p,
+        ._29HP61GA_0 ul p {
+            margin-top: 0;
+            margin-bottom: 0
+        }
+
+        ._29HP61GA_0 ol {
+            list-style: decimal;
+            margin-left: 20px
+        }
+
+        ._29HP61GA_0 ul li {
+            padding-left: 17px;
+            position: relative;
+            margin-bottom: 10px
+        }
+
+        ._29HP61GA_0 ul li:after {
+            content: "";
+            height: 6px;
+            width: 6px;
+            border-radius: 50%;
+            background: #353535;
+            position: absolute;
+            top: 10px;
+            left: 0
+        }
+
+        ._29HP61GA_0 .orange {
+            color: #fa8919
+        }
+
+        ._29HP61GA_0 .reference {
+            color: #888
+        }
+
+        ._29HP61GA_0 .m-right {
+            text-align: right
+        }
+
+        ._29HP61GA_0 .m-center {
+            text-align: center;
+            display: block
+        }
+
+        ._29HP61GA_0 .m-gray {
+            color: #888
+        }
+
+        ._29HP61GA_0 .m-small {
+            font-size: 15px
+        }
+
+        ._29HP61GA_0 table.hljs-ln {
+            margin-bottom: 0;
+            border-spacing: 0;
+            border-collapse: collapse
+        }
+
+        ._29HP61GA_0 table.hljs-ln,
+        ._29HP61GA_0 table.hljs-ln tbody,
+        ._29HP61GA_0 table.hljs-ln td,
+        ._29HP61GA_0 table.hljs-ln tr {
+            -webkit-box-sizing: border-box;
+            box-sizing: border-box
+        }
+
+        ._29HP61GA_0 table.hljs-ln td {
+            padding: 0;
+            border: 0
+        }
+
+        ._29HP61GA_0 table.hljs-ln td.hljs-ln-numbers {
+            min-width: 15px;
+            font-size: 12px;
+            color: rgba(27, 31, 35, .3);
+            text-align: right;
+            white-space: nowrap;
+            cursor: pointer;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none
+        }
+
+        ._29HP61GA_0 table.hljs-ln td.hljs-ln-code,
+        ._29HP61GA_0 table.hljs-ln td.hljs-ln-numbers {
+            font-family: SFMono-Regular, Consolas, Liberation Mono, Menlo, Courier, monospace;
+            line-height: 20px;
+            vertical-align: top
+        }
+
+        ._29HP61GA_0 table.hljs-ln td.hljs-ln-code {
+            position: relative;
+            padding-right: 10px;
+            padding-left: 10px;
+            overflow: visible;
+            font-size: 13px;
+            color: #666;
+            word-wrap: normal;
+            white-space: pre
+        }
+
+    </style>
+</head>
+<body>
+<div class="_29HP61GA_0">
+<h1>加餐-汇编代码编程与栈帧管理</h1>
+<p>在<a href="https://time.geekbang.org/column/article/147854">22讲</a>中，我们侧重讲解了汇编语言的基础知识，包括构成元素、汇编指令和汇编语言中常用的寄存器。学习完基础知识之后，你要做的就是多加练习，和汇编语言“混熟”。小窍门是查看编译器所生成的汇编代码，跟着学习体会。</p><p>不过，可能你是初次使用汇编语言，对很多知识点还会存在疑问，比如：</p><ul>
+<li>在汇编语言里调用函数（过程）时，传参和返回值是怎么实现的呢？</li>
+<li><a href="https://time.geekbang.org/column/article/146635">21讲</a>中运行期机制所讲的栈帧，如何通过汇编语言实现？</li>
+<li>条件语句和循环语句如何实现？</li>
+<li>……</li>
+</ul><p>为此，我策划了一期加餐，针对性地讲解这样几个实际场景，希望帮你加深对汇编语言的理解。</p><h2>示例1：过程调用和栈帧</h2><p>这个例子涉及了一个过程调用（相当于C语言的函数调用）。过程调用是汇编程序中的基础结构，它涉及到<strong>栈帧的管理、参数的传递</strong>这两个很重要的知识点。</p><p>假设我们要写一个汇编程序，实现下面C语言的功能：</p><pre><code>/*function-call1.c */
+#include &lt;stdio.h&gt;
+int fun1(int a, int b){
+    int c = 10;
+    return a+b+c;
+}
+
+int main(int argc, char *argv[]){
+    printf(&quot;fun1: %d\n&quot;, fun1(1,2));
+    return 0;
+} 
+</code></pre><p>fun1函数接受两个整型的参数：a和b，来看看这两个参数是怎样被传递过去的，手写的汇编代码如下：</p><pre><code># function-call1-craft.s 函数调用和参数传递
+    # 文本段,纯代码
+    .section    __TEXT,__text,regular,pure_instructions
+
+_fun1:
+    # 函数调用的序曲,设置栈指针
+    pushq   %rbp           # 把调用者的栈帧底部地址保存起来   
+    movq    %rsp, %rbp     # 把调用者的栈帧顶部地址,设置为本栈帧的底部
+
+    subq    $4, %rsp       # 扩展栈
+
+    movl    $10, -4(%rbp)  # 变量c赋值为10，也可以写成 movl $10, (%rsp)
+
+    # 做加法
+    movl    %edi, %eax     # 第一个参数放进%eax
+    addl    %esi, %eax     # 把第二个参数加到%eax,%eax同时也是存放返回值的寄存器
+    addl    -4(%rbp), %eax # 加上c的值
+
+    addq    $4, %rsp       # 缩小栈
+
+    # 函数调用的尾声,恢复栈指针为原来的值
+    popq    %rbp           # 恢复调用者栈帧的底部数值
+    retq                   # 返回
+
+    .globl  _main          # .global伪指令让_main函数外部可见
+_main:                                  ## @main
+    
+    # 函数调用的序曲,设置栈指针
+    pushq   %rbp           # 把调用者的栈帧底部地址保存起来  
+    movq    %rsp, %rbp     # 把调用者的栈帧顶部地址,设置为本栈帧的底部
+    
+    # 设置第一个和第二个参数,分别为1和2
+    movl    $1, %edi
+    movl    $2, %esi
+
+    callq   _fun1                # 调用函数
+
+    # 为pritf设置参数
+    leaq    L_.str(%rip), %rdi   # 第一个参数是字符串的地址
+    movl    %eax, %esi           # 第二个参数是前一个参数的返回值
+
+    callq   _printf              # 调用函数
+
+    # 设置返回值。这句也常用 xorl %esi, %esi 这样的指令,都是置为零
+    movl    $0, %eax
+    
+    # 函数调用的尾声,恢复栈指针为原来的值
+    popq    %rbp         # 恢复调用者栈帧的底部数值
+    retq                 # 返回
+
+    # 文本段,保存字符串字面量                                  
+    .section    __TEXT,__cstring,cstring_literals
+L_.str:                                 ## @.str
+    .asciz  &quot;Hello World! :%d \n&quot;
+</code></pre><p><strong>需要注意，</strong>手写的代码跟编译器生成的可能有所不同，但功能是等价的，代码里有详细的注释，你肯定能看明白。</p><p><strong>借用这个例子，我们讲一下栈的管理。</strong>在示例代码的两个函数里，有这样的固定结构：</p><!-- [[[read_end]]] --><pre><code> # 函数调用的序曲,设置栈指针
+    pushq	%rbp	     # 把调用者的栈帧底部地址保存起来  
+    movq	%rsp, %rbp   # 把调用者的栈帧顶部地址，设置为本栈帧的底部
+
+    ...
+
+    # 函数调用的尾声,恢复栈指针为原来的值
+    popq	%rbp         # 恢复调用者栈帧的底部数值
+</code></pre><p>在C语言生成的代码中，一般用%rbp寄存器指向栈帧的底部，而%rsp则指向栈帧的顶部。<strong>栈主要是通过push和pop这对指令来管理的：</strong>push把操作数压到栈里，并让%rsp指向新的栈顶，pop把栈顶数据取出来，同时调整%rsp指向新的栈顶。</p><p>在进入函数的时候，用pushq %rbp指令把调用者的栈帧地址存起来（根据调用约定保护起来），而把调用者的栈顶地址设置成自己的栈底地址，它等价于下面两条指令，你可以不用push指令，而是运行下面两条指令：</p><pre><code>subq $8, %rsp        #把%rsp的值减8，也就是栈增长8个字节，从高地址向低地址增长
+movq %rbp, (%rsp)    #把%rbp的值写到当前栈顶指示的内存位置
+</code></pre><p>而在退出函数前，调用了popq %rbp指令。它恢复了之前保存的栈指针的地址，等价于下面两条指令：</p><pre><code>movq (%rsp), %rbp    #把栈顶位置的值恢复回%rbp，这是之前保存在栈里的值。
+addq $8, %rsp        #把%rsp的值加8，也就是栈减少8个字节
+</code></pre><p>上述过程画成一张直观的图，表示如下：</p><p><img src="https://static001.geekbang.org/resource/image/45/df/450388ce0b3189fbf263da402bc447df.jpg" alt=""></p><p>上面每句指令执行以后，我们看看%rbp和%rsp值的变化：</p><p><img src="https://static001.geekbang.org/resource/image/cb/37/cb2d407708afd5c6e52ac43c4a4e0a37.jpg" alt=""></p><p>再来看看使用局部变量的时候会发生什么：</p><pre><code>    subq    $4, %rsp       # 扩展栈
+
+    movl    $10, -4(%rbp)  # 变量c赋值为10，也可以写成 movl $10, (%rsp)
+
+    ...
+
+    addq    $4, %rsp       # 缩小栈
+</code></pre><p>我们通过减少%rsp的值，来扩展栈，然后在扩展出来的4个字节的位置上写入整数，这就是变量c的值。在返回函数前，我们通过addq $4, %rsp再把栈缩小。这个过程如下图所示：</p><p><img src="https://static001.geekbang.org/resource/image/94/4a/94cf6dbfae7169f6ef01a09e804b7c4a.jpg" alt=""></p><p>在这个例子中，我们通过移动%rsp指针来改变帧的大小。%rbp和%rsp之间的空间就是当前栈帧。而过程调用和退出过程，分别使用call指令和ret指令。“callq  _fun1”是调用_fun1过程，这个指令相当于下面两句代码，它用到了栈来保存返回地址：</p><pre><code>pushq %rip  # 保存下一条指令的地址，用于函数返回继续执行
+jmp _fun1   # 跳转到函数_fun1
+</code></pre><p>_fun1函数用ret指令返回，它相当于：</p><pre><code>popq %rip   #恢复指令指针寄存器
+jmp %rip
+</code></pre><p>上一讲，我提到，在X86-64架构下，新的规范让程序可以访问栈顶之外128字节的内存，所以，我们甚至不需要通过改变%rsp来分配栈空间，而是直接用栈顶之外的空间。</p><p>上面的示例程序，你可以用as命令生成可执行程序，运行一下看看，然后试着做一下修改，逐步熟悉汇编程序的编写思路。</p><h2>示例2：同时使用寄存器和栈来传参</h2><p>上一个示例中，函数传参只使用了两个参数，这时是通过两个寄存器传递参数的。这次，我们使用8个参数，来看看通过寄存器和栈传参这两种不同的机制。</p><p>在X86-64架构下，有很多的寄存器，所以程序调用约定中规定尽量通过寄存器来传递参数，而且，只要参数不超过6个，都可以通过寄存器来传参，使用的寄存器如下：</p><p><img src="https://static001.geekbang.org/resource/image/4d/53/4d066afb9834f2a602bca2010e6edb53.jpg" alt=""></p><p>超过6个的参数的话，我们要再加上栈来传参：</p><p><img src="https://static001.geekbang.org/resource/image/45/89/45587ab64c83ea52f9d1fd3fedc6b189.jpg" alt=""></p><p>根据程序调用约定的规定，参数1～6是放在寄存器里的，参数7和8是放到栈里的，先放参数8，再放参数7。</p><p>在23讲，我会带你为下面的一段playscript程序生成汇编代码：</p><pre><code>//asm.play
+int fun1(int x1, int x2, int x3, int x4, int x5, int x6, int x7, int x8){
+    int c = 10; 
+    return x1 + x2 + x3 + x4 + x5 + x6 + x7 + x8 + c;
+}
+
+println(&quot;fun1:&quot; + fun1(1,2,3,4,5,6,7,8));
+</code></pre><p>现在，我们可以按照调用约定，先手工编写一段实现相同功能的汇编代码：</p><pre><code># function-call2-craft.s 函数调用和参数传递
+    # 文本段,纯代码
+    .section    __TEXT,__text,regular,pure_instructions
+
+_fun1:
+    # 函数调用的序曲,设置栈指针
+    pushq   %rbp           # 把调用者的栈帧底部地址保存起来   
+    movq    %rsp, %rbp     # 把调用者的栈帧顶部地址,设置为本栈帧的底部
+
+    movl    $10, -4(%rbp)  # 变量c赋值为10,也可以写成 movl $10, (%rsp)
+
+    # 做加法
+    movl    %edi, %eax     # 第一个参数放进%eax
+    addl    %esi, %eax     # 加参数2
+    addl    %edx, %eax     # 加参数3
+    addl    %ecx, %eax     # 加参数4
+    addl    %r8d, %eax     # 加参数5
+    addl    %r9d, %eax     # 加参数6
+    addl    16(%rbp), %eax  # 加参数7
+    addl    24(%rbp), %eax  # 加参数8
+    
+    addl    -4(%rbp), %eax # 加上c的值
+
+    # 函数调用的尾声,恢复栈指针为原来的值
+    popq    %rbp           # 恢复调用者栈帧的底部数值
+    retq                   # 返回
+
+    .globl  _main          # .global伪指令让_main函数外部可见
+_main:                                  ## @main
+    
+    # 函数调用的序曲,设置栈指针
+    pushq   %rbp           # 把调用者的栈帧底部地址保存起来  
+    movq    %rsp, %rbp     # 把调用者的栈帧顶部地址,设置为本栈帧的底部
+    
+    subq    $16, %rsp      # 这里是为了让栈帧16字节对齐，实际使用可以更少
+
+    # 设置参数
+    movl    $1, %edi     # 参数1
+    movl    $2, %esi     # 参数2
+    movl    $3, %edx     # 参数3
+    movl    $4, %ecx     # 参数4
+    movl    $5, %r8d     # 参数5
+    movl    $6, %r9d     # 参数6
+    movl    $7, (%rsp)   # 参数7
+    movl    $8, 8(%rsp)  # 参数8
+
+    callq   _fun1                # 调用函数
+
+    # 为pritf设置参数
+    leaq    L_.str(%rip), %rdi   # 第一个参数是字符串的地址
+    movl    %eax, %esi           # 第二个参数是前一个参数的返回值
+
+    callq   _printf              # 调用函数
+
+    # 设置返回值。这句也常用 xorl %esi, %esi 这样的指令,都是置为零
+    movl    $0, %eax
+
+    addq    $16, %rsp    # 缩小栈
+    
+    # 函数调用的尾声,恢复栈指针为原来的值
+    popq    %rbp         # 恢复调用者栈帧的底部数值
+    retq                 # 返回
+
+    # 文本段,保存字符串字面量                                  
+    .section    __TEXT,__cstring,cstring_literals
+L_.str:                                 ## @.str
+    .asciz  &quot;fun1 :%d \n&quot;
+</code></pre><p>用as命令，把这段汇编代码生成可执行文件，运行后会输出结果：“fun1: 46”。</p><pre><code>as functio-call2-craft.s -o function-call2
+./function-call2
+</code></pre><p>这段程序虽然有点儿长，但思路很清晰，比如，每个函数（过程）都有固定的结构。7～10行，我叫做序曲，是设置栈帧的指针；25~26行，我叫做尾声，是恢复栈底指针并返回；13~22行是做一些计算，还要为本地变量在栈里分配一些空间。</p><p><strong>我建议你读代码的时候，</strong>对照着每行代码的注释，弄清楚这条代码所做的操作，以及相关的寄存器和内存中值的变化，脑海里有栈帧和寄存器的直观的结构，就很容易理解清楚这段代码了。</p><p>除了函数调用以外，我们在编程时经常使用循环语句和if语句，它们转换成汇编是什么样子呢？我们来研究一下，首先看看while循环语句。</p><h2>示例3：循环语句的汇编码解析</h2><p>看看下面这个C语言的语句：</p><pre><code>void fun1(int a){
+    while (a &lt; 10){
+        a++;
+    }
+}
+</code></pre><p>我们要使用"gcc -S ifstmt.c -o ifstmt.s"命令，把它转换成汇编语句（注意不要带优化参数）：</p><pre><code> .section    __TEXT,__text,regular,pure_instructions
+    .macosx_version_min 10, 15
+    .globl  _fun1                   ## -- Begin function fun1
+    .p2align    4, 0x90
+_fun1:                                  ## @fun1
+    .cfi_startproc
+## %bb.0:
+    pushq   %rbp
+    .cfi_def_cfa_offset 16
+    .cfi_offset %rbp, -16
+    movq    %rsp, %rbp
+    .cfi_def_cfa_register %rbp
+    movl    %edi, -4(%rbp)   #把参数a放到栈里
+LBB0_1:                      ## =&gt;This Inner Loop Header: Depth=1
+    cmpl    $10, -4(%rbp)    #比较参数1和立即数10,设置eflags寄存器
+    jge LBB0_3               #如果大于等于，则跳转到LBB0_3基本块
+## %bb.2:                    ##   in Loop: Header=BB0_1 Depth=1
+    movl    -4(%rbp), %eax   #这2行，是给a加1
+    addl    $1, %eax
+    movl    %eax, -4(%rbp)
+    jmp LBB0_1
+LBB0_3:
+    popq    %rbp
+    retq
+    .cfi_endproc
+                                        ## -- End function
+
+.subsections_via_symbols
+</code></pre><p>这段代码的15、16、21行是关键，我解释一下：</p><ul>
+<li>第15行，用cmpl指令，将%edi寄存器中的参数1（即C代码中的参数a）和立即数10做比较，比较的结果会设置EFLAGS寄存器中的相关位。</li>
+</ul><p>EFLAGS中有很多位，下图是<a href="https://software.intel.com/en-us/download/intel-64-and-ia-32-architectures-sdm-combined-volumes-1-2a-2b-2c-2d-3a-3b-3c-3d-and-4">Intel公司手册</a>中对各个位的解释，有的指令会影响这些位的设置，比如cmp指令，有的指令会从中读取信息，比如16行的jge指令：</p><p><img src="https://static001.geekbang.org/resource/image/d7/46/d79cff3bef9e77f825ed9866c5dd1146.jpg" alt=""></p><ul>
+<li>
+<p>第16行，jge指令。jge是“jump if greater or equal”的缩写，也就是当大于或等于的时候就跳转。大于等于是从哪知道的呢？就是根据EFLAGS中的某些位计算出来的。</p>
+</li>
+<li>
+<p>第21行，跳转到循环的开始。</p>
+</li>
+</ul><p>在这个示例中，我们看到了jmp（无条件跳转指令）和jge（条件跳转指令）两个跳转指令。条件跳转指令很多，它们分别是基于EFLAGS的状态位做不同的计算，判断是否满足跳转条件，看看下面这张表格：</p><p><img src="https://static001.geekbang.org/resource/image/ce/d5/ce52ac9632428550896ce20f958651d5.jpg" alt=""></p><p>表格中的跳转指令，是基于有符号的整数进行判断的，对于无符号整数、浮点数，还有很多其他的跳转指令。现在你应该体会到，汇编指令为什么这么多了。<strong>好在其助记符都是有规律的，可以看做英文缩写，所以还比较容易理解其含义。</strong></p><p><strong>另外我再强调一下，</strong>刚刚我让你生成汇编时，不要带优化参数，那是因为优化算法很“聪明”，它知道这个循环语句对函数最终的计算结果没什么用，就优化掉了。后面学优化算法时，你会理解这种优化机制。</p><p>不过这样做，也会有一个不好的影响，就是代码不够优化。比如这段代码把参数1拷贝到了栈里，在栈里做运算，而不是直接基于寄存器做运算，这样性能会低很多，这是没有做寄存器优化的结果。</p><h2>示例4：if语句的汇编码解析</h2><p>循环语句看过了，if语句如何用汇编代码实现呢？</p><p>看看下面这段代码：</p><pre><code>int fun1(int a){
+    if (a &gt; 10){
+        return 4;
+    }
+    else{
+        return 8;
+    }
+}
+</code></pre><p>把上面的C语言代码转换成汇编代码如下：</p><pre><code>   .section    __TEXT,__text,regular,pure_instructions
+    .macosx_version_min 10, 15
+    .globl  _fun1                   ## -- Begin function fun1
+    .p2align    4, 0x90
+_fun1:                                  ## @fun1
+    .cfi_startproc
+## %bb.0:
+    pushq   %rbp
+    .cfi_def_cfa_offset 16
+    .cfi_offset %rbp, -16
+    movq    %rsp, %rbp
+    .cfi_def_cfa_register %rbp
+    movl    %edi, -8(%rbp)
+    cmpl    $10, -8(%rbp)  #将参数a与10做比较
+    jle LBB0_2             #小于等于的话就调转到LBB0_2基本块
+## %bb.1:
+    movl    $4, -4(%rbp)   #否则就给a赋值为4
+    jmp LBB0_3
+LBB0_2:
+    movl    $8, -4(%rbp)   #给a赋值为8
+LBB0_3:
+    movl    -4(%rbp), %eax #设置返回值
+    popq    %rbp
+    retq
+    .cfi_endproc
+                                        ## -- End function
+
+.subsections_via_symbols
+</code></pre><p>了解了条件跳转指令以后，再理解上面的代码容易了很多。还是先做比较，设置EFLAGS中的位，然后做跳转。</p><h2>示例5：浮点数的使用</h2><p>之前我们用的例子都是采用整数，现在使用浮点数来做运算，看看会有什么不同。</p><p>看看下面这段代码：</p><pre><code>float fun1(float a, float b){
+    float c = 2.0;
+    return a + b + c;
+}
+</code></pre><p>使用-O2参数，把C语言的程序编译成汇编代码如下：</p><pre><code>  .section    __TEXT,__text,regular,pure_instructions
+    .macosx_version_min 10, 15
+    .section    __TEXT,__literal4,4byte_literals
+    .p2align    2               ## -- Begin function fun1
+LCPI0_0:
+    .long   1073741824              ## float 2 常量
+    .section    __TEXT,__text,regular,pure_instructions
+    .globl  _fun1
+    .p2align    4, 0x90
+_fun1:                                  ## @fun1
+    .cfi_startproc
+## %bb.0:
+    pushq   %rbp
+    .cfi_def_cfa_offset 16
+    .cfi_offset %rbp, -16
+    movq    %rsp, %rbp
+    .cfi_def_cfa_register %rbp
+    addss   %xmm1, %xmm0    #浮点数传参用XMM寄存器，加法用addss指令
+    addss   LCPI0_0(%rip), %xmm0  #把常量2.0加到xmm0上，xmm0保存返回值
+    popq    %rbp
+    retq
+    .cfi_endproc
+                                        ## -- End function
+
+.subsections_via_symbols
+</code></pre><p>这个代码的结构你应该熟悉了，栈帧的管理方式都是一样的，都要维护%rbp和%rsp。不一样的地方，有几个地方：</p><ul>
+<li>
+<p>传参。给函数传递浮点型参数，是要使用XMM寄存器。</p>
+</li>
+<li>
+<p>指令。浮点数的加法运算，使用的是addss指令，它用于对单精度的标量浮点数做加法计算，这是一个SSE1指令。SSE1是一组指令，主要是对单精度浮点数(比如C或Java语言中的float)进行运算的，而SSE2则包含了一些双精度浮点数（比如C或Java语言中的double）的运算指令。</p>
+</li>
+<li>
+<p>返回值。整型返回值是放在%eax寄存器中，而浮点数返回值是放在xmm0寄存器中的。调用者可以从这里取出来使用。</p>
+</li>
+</ul><h2>课程小结</h2><p>利用本节课的加餐，我带你把编程中常见的一些场景，所对应的汇编代码做了一些分析。你需要记住的要点如下：</p><ul>
+<li>
+<p>函数调用时，会使用寄存器传参，超过6个参数时，还要再加上栈，这都是遵守了调用约定。</p>
+</li>
+<li>
+<p>通过push、pop指令来使用栈，栈与%rbp和%rsp这两个指针有关。你可以图形化地记住栈的增长和回缩的过程。需要注意的是，是从高地址向低地址走，所以访问栈里的变量，都是基于%rbp来减某个值。使用%rbp前，要先保护起来，别破坏了调用者放在里面的值。</p>
+</li>
+<li>
+<p>循环语句和if语句的秘密在于比较指令和有条件跳转指令，它们都用到了EFLAGS寄存器。</p>
+</li>
+<li>
+<p>浮点数的计算要用到MMX寄存器，指令也有所不同。</p>
+</li>
+</ul><p>通过这次加餐，你会更加直观地了解汇编语言，接下来的课程中，我会带你尝试通过翻译AST自动生成这些汇编代码，让你直观理解编译器生成汇编码的过程。</p><h2>一课一思</h2><p>你了解到哪些地方会使用汇编语言编程？有没有一些比较有意思的场景？是否实现了一些普通高级语言难以实现的结果？欢迎在留言区分享你的经验。</p><p>最后，感谢你的阅读，如果这篇文章让你有所收获，也欢迎你将它分享给更多的朋友。</p><p><img src="https://static001.geekbang.org/resource/image/00/66/008ff7b6092be5463a414a0e0771dc66.jpg" alt=""></p><h2>精选留言：</h2>
+        <ul>
+        
+<li>
+    <div>
+        <div style="color: #888;font-size:15.25px;font-weight:400;line-height:1.2">
+            沉淀的梦想  2019-10-14 14:37:46
+        </div>
+        <div style="color:#353535;font-weight:400;white-space:normal;word-break:break-all;line-height:1.6">
+            老师的as用的什么版本，为什么我用as汇编文稿中的代码会出错（注释删了也一样会出错）：<br><br>function-call2-craft.s: Assembler messages:<br>function-call2-craft.s:2: Error: no such instruction: `n-call2-craft.s 函数调用和参数传递&#39;<br>function-call2-craft.s:4: Error: character following name is not &#39;#&#39;<br>function-call2-craft.s:66: Error: character following name is not &#39;#&#39;<br> 
+        </div>
+        <br/>
+<div>
+    <div style="color:#888;font-size:15.25px;font-weight:400;line-height:1.2">作者回复2019-10-14 17:11:55</div>
+    <div style="color:#353535;font-weight:400;white-space:normal;word-break:break-all;line-height:1.6">macOS操作系统，gnu汇编器。<br>Linux上生成的汇编码应该也差不多，有些系统调用是不同的。<br>windows上，你就要安装一下相关的环境了和工具了，比如MinGW。或者装一个Linux虚拟机。</div>
+</div>
+            
+    </div>
+</li>
+            
+<br/>
+
+<li>
+    <div>
+        <div style="color: #888;font-size:15.25px;font-weight:400;line-height:1.2">
+            沉淀的梦想  2019-10-14 14:36:09
+        </div>
+        <div style="color:#353535;font-weight:400;white-space:normal;word-break:break-all;line-height:1.6">
+            老师在课中讲了不少“栈”的操作，那编程语言对于&quot;堆&quot;又是用什么指令操作的呢？ 
+        </div>
+        <br/>
+<div>
+    <div style="color:#888;font-size:15.25px;font-weight:400;line-height:1.2">作者回复2019-10-14 17:13:18</div>
+    <div style="color:#353535;font-weight:400;white-space:normal;word-break:break-all;line-height:1.6">鼓励你用c语言，使用malloc和free来申请和释放内存，看看生成的汇编是怎样的。</div>
+</div>
+            
+    </div>
+</li>
+            
+<br/>
+
+<li>
+    <div>
+        <div style="color: #888;font-size:15.25px;font-weight:400;line-height:1.2">
+            pebble  2019-10-14 10:06:10
+        </div>
+        <div style="color:#353535;font-weight:400;white-space:normal;word-break:break-all;line-height:1.6">
+            例一的俩栈帧图里，rbp跟rsp，是否应该都指向再下一个位置呢，rsp指向的，应该是下次要保存数据的位置吧 
+        </div>
+        <br/>
+<div>
+    <div style="color:#888;font-size:15.25px;font-weight:400;line-height:1.2">作者回复2019-10-14 11:23:37</div>
+    <div style="color:#353535;font-weight:400;white-space:normal;word-break:break-all;line-height:1.6">不是。<br>rbp，指向栈底。这个值在整合函数执行期间是不变的。<br>rsp，指向栈顶。这个值会在某些情况下改变：<br>(1)push和pop命令可以改变rsp。<br>(2)call指令，因为要把返回地址压栈，实际也改变了rsp。<br>(3)在使用本地变量时，手工改变rsp的值。<br>rsp如果指向下次要保存数据的位置，相当于栈里总有一个空单元。</div>
+</div>
+            
+    </div>
+</li>
+            </ul>
+</div>
+</body>
+</html>
